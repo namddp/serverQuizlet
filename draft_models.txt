@@ -1,0 +1,90 @@
+/*
+
+Đăng nhập/ Đăng ký  :
+      - Giáo viên, học sinh: 
+            + Trang chủ (hiển thị nhiều topic đề thi, vật lý, toán, js...)
+            + Trang cá nhân (thông tin cá nhân, thống kê, bộ sưu tập đề thi).
+            + Trang tạo đề thi (thêm câu hỏi, thêm đáp án, thêm hình ảnh, thêm video, thêm audio, thêm đề thi vào bộ sưu tập).
+            + Trang thi: (thi thử, thi thật, xem đáp án, xem thống kê, xem bảng xếp hạng...)
+
+
+
+Data model: 
+   - Học sinh vs giáo viên: 
+        email: string
+        displayName: string
+        accountType: "student" | "teacher"
+        avatar: string
+        id: string
+
+
+   - Topic:
+        id: string
+        name: string
+
+   - Đề thi:
+        id: string
+        topicId: string
+        isPrivate: boolean
+        examType: "multiple_choice" | "essay" | "mixed"
+        link: string
+        name: string
+        questions: 
+
+
+          - mutiple_choice:   questions: Question[
+                                                {
+                                                  id: string,
+                                                  content: string,
+                                                  isMultipleChoice: boolean,
+                                                  answers: Answer[
+                                                    {
+                                                      id: string,
+                                                      content: string,
+                                                      isCorrect: boolean
+                                                    }
+                                                  ],
+                                                }
+                                            ]
+
+          - essay: questions: Question[
+                {
+                  id: string,
+                  content: string,
+                  maxScore: number,
+                }
+              ]
+
+
+
+        - Bài thi:
+            answerSheetId: string
+            examId: string
+            studentId: string
+            score: number
+            isDone: boolean
+            examType: "multiple_choice" | "essay" | "mixed"
+
+            - multiple_choice:
+                answers: Answer[
+                  {
+                    questionId: string,
+                    studentAnswer: string[answerId],
+                    correctAnswer: string[answerId],
+                  }
+                ]
+
+            - essay:
+                answers: Answer[
+                  {
+                    questionId: string,
+                    studentAnswer: string,
+                    score: number,
+                  }
+                ]
+                
+            
+
+
+
+*/
