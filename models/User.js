@@ -13,39 +13,26 @@ const userSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        required: true,
         unique: true
     },
-    // isVerified: {
-    //     type: Boolean,
-    //     default: false,
-    // },
     accountType: {
         type: String,
-        default: "guest",
-        required: true
-    },
-    // Profile data
-    realName: {
-        type: String,
-        default: null
-    },
-    gender: {
-        type: String,
-        default: null
+        default: "student",
     },
     avatar: {
         type: String,
         default: null
     },
-    age: {
-        type: Number,
-        default: null
-    },
-    dateOfBirth: {
-        type: Date,
-        default: null
-    }
+    classes: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Class',
+        }
+    ],
+    // isVerified: {
+    //     type: Boolean,
+    //     default: false,
+    // },
 },
     { timestamps: true }
 );
