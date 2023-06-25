@@ -1,7 +1,14 @@
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema({
-    //Auth data    
+const userSchema = new mongoose.Schema({  
+    userID: {
+        type: Schema.Types.ObjectId,
+        unique: true,
+    },
+    username: {
+        type: String,
+        unique: true
+    },
     email: {
         type: String,
         required: true,
@@ -10,10 +17,6 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-    },
-    username: {
-        type: String,
-        unique: true
     },
     accountType: {
         type: String,
@@ -27,6 +30,7 @@ const userSchema = new mongoose.Schema({
         {
             type: Schema.Types.ObjectId,
             ref: 'Class',
+            default: []
         }
     ],
     // isVerified: {
@@ -36,6 +40,14 @@ const userSchema = new mongoose.Schema({
 },
     { timestamps: true }
 );
+
+// middleware để lấy giá trị _id (do mongo gen mặc định) gán cho userID (dùng để tham chiếu data)
+userSchema.pre('save', function (next) {
+    if (!this.userID) {
+        this.userID = this._id;
+    }
+    next();
+});
 
 const User = mongoose.model('User', userSchema);
 

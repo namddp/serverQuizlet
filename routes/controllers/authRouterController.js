@@ -8,47 +8,47 @@ import admin from '../../configs/firebase.js';
 
 const authRouterController = {
 
-    //Register
+    //Đăng ký
     register: async (req, res) => {
         try {
 
             const { email, username, password } = req.body;
 
-            // Check input
-            if (!email || !username|| !password) {
+            // Kiểm tra input
+            if (!email || !username || !password) {
                 return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin đăng ký' });
             }
 
-            // Check if email is already reigestered
+            //Kiểm tra username trùng
+            const duplicatedName = await User.findOne({ username: username });
+
+            if (duplicatedName) {
+                return res.status(409).json({ message: 'Tên người dùng này đã được sử dụng!' });
+            }
+
+            // Kiểm tra email trùng
             const duplicatedEmail = await User.findOne({ email: email });
 
             if (duplicatedEmail) {
                 return res.status(409).json({ message: 'Email này đã được sử dụng!' });
             }
 
-            //Check if usernameis already taken
-            const duplicatedName = await User.findOne({ username: username});
-
-            if (duplicatedName) {
-                return res.status(409).json({ message: 'Tên người dùng này đã được sử dụng!' });
-            }
-
-            //add new user to db
+            // Thêm user mới vào DB
             const hashedPW = bcrypt.hashSync(password, 10);
-            
+
             const registerInfo = new User({
-                email: email,
                 username: username,
+                email: email,
                 password: hashedPW,
             });
 
             const newUser = await registerInfo.save();
-            //using save() instead of insertOne() to apply the schema template for new doc
+            // Dùng method save() thay vì insertOne() để tạo document mới với toàn bộ các trường dữ liệu đã định nghĩa trong schema User
 
             if (!newUser) {
                 return res.status(500).json({ message: "Đăng ký không thành công!" });
             };
-            
+
             res.status(201).json({
                 message: "Đăng ký thành công.",
             });
@@ -59,17 +59,44 @@ const authRouterController = {
         }
     },
 
-//Login with account
+    // Tạo access token (JWT) cho user đăng nhập bằng email & pw
+    genAccessToken: (user) => {
+        return jwt.sign(
+            {
+                userID: user.userID,
+                username: user.username,
+                email: user.email,
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "1h" }
+        );
+    },
+
+    // Tạo refresh token (JWT) cho user login bằng email & pw
+    genRefreshToken: (user) => {
+        return jwt.sign(
+            {
+                userID: user.userID,
+                username: user.username,
+                email: user.email,
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: "1d" }
+        );
+    },
+
+    //Đăng nhập bằng email & pw
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
 
-            // Check input
+            // Kiểm tra input
             if (!email || !password) {
                 return res.status(400).json({ message: 'Vui lòng nhập đầy đủ Email và Mật khẩu' });
             };
 
-            // Check if user is already existed in DB or not
+
+            // Kiểm tra user có trong DB hay không
             const user = await User.findOne({
                 email: email,
             });
@@ -78,32 +105,30 @@ const authRouterController = {
                 return res.status(400).json({ message: 'Không tìm thấy người dùng!' });
             };
 
-            // Check password
+            // Kiểm tra mật khẩu
             const isValidPW = bcrypt.compareSync(password, user.password);
 
             if (!isValidPW) {
-                return res.status(400).json({ message: 'Mật khẩu không đúng!' });
+                return res.status(400).json({ message: 'Mật khẩu không chính xác!' });
             };
 
             if (user && isValidPW) {
+                // Đăng nhập thành công, cấp token
+                const accessToken = authRouterController.genAccessToken(user);
+                const refreshToken = authRouterController.genRefreshToken(user);
 
-                const accessToken = authRouteController.genAccessToken(user);
-                const refreshToken = authRouteController.genRefreshToken(user);
-
-                //storing refresh token to check if the same user is requesting to refresh
-                refreshTokens.push(refreshToken);
-
-                //storing refresh token in cookies to generate new access token when old one is expired
+                // Lưu refreshToken vào cookie của request để tạo access token mới khi token cũ hết hạn
                 res.cookie("refreshToken", refreshToken, {
                     httpOnly: true,
                     secure: false,
                     path: "/",
-                    sameSite: "strict"
+                    sameSite: "strict",
+                    maxAge: 1000 * 60 * 60 * 24 // 1 ngày,
                 });
 
                 const { password, ...othersInfo } = user._doc;
-                //exclude sensitive data from the user document before sending it in the response.
-                //user._doc = only get stored value (user object includes User model and other structural values/metadata that is unneccessory to send to client)
+                // loại bỏ password trước khi gửi trả thông tin người dùng trong response.
+                // user._doc = lấy ra các trường dữ liệu có giá trị do dev define, lược bỏ các trường metadata do DB thêm khi tạo doc.
 
                 //handle CORS - allow refresh token to be shown on req header so client side can access the refresh token
                 res.setHeader("refreshToken", refreshToken);
@@ -119,14 +144,14 @@ const authRouterController = {
         }
     },
 
-// Login with Google (Firebase)
+    // Login with Google (Firebase)
     // loginWithGoogle: async (req, res) => {
-    
+
     //     // Function to create a new user without the password field
     //     const createNewUserWithoutPassword = async (email, name) => {
     //         const newUser = {
     //             email: email,
-    //             : name,
+    //             username: name,
     //             accountType: 'guest',
     //         };
     //         await usersCollection.insertOne(newUser);
@@ -164,9 +189,9 @@ const authRouterController = {
     //     }
     // },
 
-//Logout
+    //Logout
 
-//Forgot password
+    //Forgot password
 
 };
 
