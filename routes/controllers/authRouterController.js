@@ -81,7 +81,7 @@ const authRouterController = {
                 email: user.email,
             },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: "1d" }
+            { expiresIn: "14d" }
         );
     },
 
@@ -113,29 +113,20 @@ const authRouterController = {
             };
 
             if (user && isValidPW) {
-                // Đăng nhập thành công, cấp token
+                // Đăng nhập thành công, cấp tokens
                 const accessToken = authRouterController.genAccessToken(user);
                 const refreshToken = authRouterController.genRefreshToken(user);
 
-                // Lưu refreshToken vào cookie của request để tạo access token mới khi token cũ hết hạn
-                res.cookie("refreshToken", refreshToken, {
-                    httpOnly: true,
-                    secure: false,
-                    path: "/",
-                    sameSite: "strict",
-                    maxAge: 1000 * 60 * 60 * 24 // 1 ngày,
-                });
-
                 const { password, ...othersInfo } = user._doc;
-                // loại bỏ password trước khi gửi trả thông tin người dùng trong response.
+                // loại bỏ password trước khi trả thông tin người dùng trong response.
                 // user._doc = lấy ra các trường dữ liệu có giá trị do dev define, lược bỏ các trường metadata do DB thêm khi tạo doc.
 
-                //handle CORS - allow refresh token to be shown on req header so client side can access the refresh token
-                res.setHeader("refreshToken", refreshToken);
-                res.setHeader('Access-Control-Expose-Headers', 'refreshToken');
-
-                //response to user, do not expose password here
-                res.status(200).json({ ...othersInfo, accessToken });
+                // trả response thông tin người dùng vừa đăng nhập và các token
+                res.status(200).json({
+                    ...othersInfo,
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                });
             }
         } catch (error) {
             res.status(500).json({
