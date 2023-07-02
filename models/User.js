@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({  
     userID: {
-        type: Schema.Types.ObjectId,
+        type: String,
+        // set: (objectID) => objectID.toString(),
         unique: true,
     },
     username: {
@@ -18,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    // dateOfBirth: {
+    //     type: Date,
+    //     required: true
+    // },
     accountType: {
         type: String,
         default: "student",
@@ -28,7 +33,7 @@ const userSchema = new mongoose.Schema({
     },
     classes: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Class',
             default: []
         }
@@ -44,7 +49,7 @@ const userSchema = new mongoose.Schema({
 // middleware để lấy giá trị _id (do mongo gen mặc định) gán cho userID (dùng để tham chiếu data)
 userSchema.pre('save', function (next) {
     if (!this.userID) {
-        this.userID = this._id;
+        this.userID = this._id.toString();
     }
     next();
 });

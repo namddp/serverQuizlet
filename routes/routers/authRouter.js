@@ -7,9 +7,10 @@ const authRouter = express.Router();
 authRouter.post("/register", authRouterController.register);
 
 //Login with account
+authRouter.post("/login", authRouterController.login);
 
 //Login with Google (Firebase)
-authRouter.post("/login/google", authRouterController.loginWithGoogle)
+// authRouter.post("/login/google", authRouterController.loginWithGoogle)
 
 //Logout
 

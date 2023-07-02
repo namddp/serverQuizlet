@@ -25,7 +25,6 @@ const authRouterMDWController = {
                     });
                 }
             }
-
             req.user = user;
             next();
         });

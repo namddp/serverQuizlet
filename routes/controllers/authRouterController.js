@@ -1,10 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import jwt from "jsonwebtoken";
-import bcrypt from 'bcrypt';
 import User from '../../models/User.js';
+import { check, validationResult } from "express-validator";
+import { sendEmail, mailConfigs } from '../../configs/nodemailer.js';
+import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
 import admin from '../../configs/firebase.js';
+
 
 const authRouterController = {
 
@@ -14,10 +17,15 @@ const authRouterController = {
 
             const { email, username, password } = req.body;
 
-            // Kiểm tra input
-            if (!email || !username || !password) {
-                return res.status(400).json({ message: 'Vui lòng nhập đầy đủ thông tin đăng ký' });
-            }
+            // Kiểm tra input với express-validator
+            await check('email').isEmail().withMessage('Email không hợp lệ').run(req);
+            await check('username').notEmpty().withMessage('Vui lòng nhập tên người dùng').run(req);
+            await check('password').notEmpty().withMessage('Vui lòng nhập mật khẩu').run(req);
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            };
 
             //Kiểm tra username trùng
             const duplicatedName = await User.findOne({ username: username });
@@ -48,6 +56,11 @@ const authRouterController = {
             if (!newUser) {
                 return res.status(500).json({ message: "Đăng ký không thành công!" });
             };
+
+            // Gửi mail thông báo đăng ký thành công
+            const mailOptions = mailConfigs.registrationSuccess(email);
+            await sendEmail(mailOptions); 
+            
 
             res.status(201).json({
                 message: "Đăng ký thành công.",
@@ -88,6 +101,16 @@ const authRouterController = {
     //Đăng nhập bằng email & pw
     login: async (req, res) => {
         try {
+
+            // Kiểm tra input với express-validator
+            await check('email').isEmail().withMessage('Vui lòng nhập email').run(req);
+            await check('password').notEmpty().withMessage('Vui lòng nhập mật khẩu').run(req);
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            };
+
             const { email, password } = req.body;
 
             // Kiểm tra input
@@ -121,11 +144,18 @@ const authRouterController = {
                 // loại bỏ password trước khi trả thông tin người dùng trong response.
                 // user._doc = lấy ra các trường dữ liệu có giá trị do dev define, lược bỏ các trường metadata do DB thêm khi tạo doc.
 
-                // trả response thông tin người dùng vừa đăng nhập và các token
+                // lưu refresh token vào cookie
+                res.cookie("refreshToken", refreshToken, {
+                    httpOnly: true,
+                    secure: false,
+                    path: "/",
+                    sameSite: "strict"
+                });
+
+                // trả response thông tin người dùng vừa đăng nhập cùng access token
                 res.status(200).json({
                     ...othersInfo,
                     accessToken: accessToken,
-                    refreshToken: refreshToken
                 });
             }
         } catch (error) {
@@ -134,6 +164,24 @@ const authRouterController = {
             });
         }
     },
+
+    // Refresh access token
+    refreshAccessToken: async (req, res) => {
+    // lấy refresh token ra từ cookie
+        const refreshToken = req.cookie.refreshToken;
+        
+        if (!refreshToken) {
+            return res.status(401).json("Bạn chưa đăng nhập!");
+        };
+
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, user) => {
+            if (error.name === "TokenExpiredError") {
+                return res.status(401).json({
+                    error: "Refresh token đã hết hạn, vui lòng đăng nhập lại!"
+                });
+            }
+        })
+    }
 
     // Login with Google (Firebase)
     // loginWithGoogle: async (req, res) => {
