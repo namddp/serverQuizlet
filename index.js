@@ -12,6 +12,8 @@ import { connectDB } from "./configs/mongoDB.js";
 
 // routes
 import authRouter from "./routes/routers/authRouter.js";
+import questionsRouter from "./routes/routers/questionsRouter.js";
+import examsRouter from "./routes/routers/examsRouter.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,7 +29,9 @@ async function main() {
     app.use(express.json());
 
     // Setup routes
-    app.use("/auth", authRouter)
+    app.use("/auth", authRouter);
+    app.use("/questions", questionsRouter);
+    app.use("/exams", examsRouter);
 
     // Start server
     app.listen(PORT, () => {
