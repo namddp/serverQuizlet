@@ -6,7 +6,7 @@ import { check, validationResult } from "express-validator";
 import { sendEmail, mailConfigs } from "../../configs/nodemailer.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import admin from "../../configs/firebase.js";
+// import admin from "../../configs/firebase.js";
 
 const authRouterController = {
   //Đăng ký
