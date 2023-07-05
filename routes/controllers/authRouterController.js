@@ -15,7 +15,7 @@ const authRouterController = {
     register: async (req, res) => {
         try {
 
-            const { email, username, password } = req.body;
+            const { email, username, password, dateOfBirth } = req.body;
 
             // Kiểm tra input với express-validator
             await check('email').isEmail().withMessage('Email không hợp lệ').run(req);
@@ -48,6 +48,7 @@ const authRouterController = {
                 username: username,
                 email: email,
                 password: hashedPW,
+                dateOfBirth: dateOfBirth
             });
 
             const newUser = await registerInfo.save();

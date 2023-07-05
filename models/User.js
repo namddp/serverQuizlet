@@ -19,10 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    // dateOfBirth: {
-    //     type: Date,
-    //     required: true
-    // },
+    dateOfBirth: {
+        type: Date,
+        required: true
+    },
     accountType: {
         type: String,
         default: "student",
