@@ -2,10 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import { v4 as uuidv4 } from "uuid";
 import Question from "../../models/Question.js";
-import { check, validationResult } from "express-validator";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import admin from "../../configs/firebase.js";
 
 const questionController = {
   getAllQuestions: async (req, res) => {
