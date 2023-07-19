@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { v4 as uuidv4 } from "uuid";
-import Exam from "../models/exam";
+import Exam from "../../models/Exam.js";
 
 const examController = {
   createExam: async (req, res) => {

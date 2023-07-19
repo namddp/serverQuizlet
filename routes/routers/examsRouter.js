@@ -1,5 +1,5 @@
 import express from "express";
-import examController from "../controllers/examController";
+import examController from "../controllers/examController.js";
 const examsRouter = express.Router();
 
 examsRouter.post("/", examController.createExam);
