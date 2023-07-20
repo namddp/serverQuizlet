@@ -1,6 +1,6 @@
 import Subject from "../../models/Subject.js"
-import Question from "../../models/Question";
-import Exam from "../../models/Exam";
+import Question from "../../models/Question.js";
+import Exam from "../../models/Exam.js";
 const searchController = {
   searchSubjects : async (req, res) => {
     try {
