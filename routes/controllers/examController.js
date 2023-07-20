@@ -1,12 +1,13 @@
-import dotenv from "dotenv";
-dotenv.config();
-import { v4 as uuidv4 } from "uuid";
-import Exam from "../../models/Exam.js";
+import express from 'express';
+import Exam from '../../models/Exam.js';
 
 const examController = {
+  // Endpoint: Tạo đề thi mới
   createExam: async (req, res) => {
     try {
-      const {
+      const { examID, subject, createdBy, isPrivate, title, type, link, examDate, duration, minScore, questionsList } = req.body;
+      const newExam = new Exam({
+        examID,
         subject,
         createdBy,
         isPrivate,
@@ -16,125 +17,64 @@ const examController = {
         examDate,
         duration,
         minScore,
-        questionsList,
-      } = req.body;
-
-      const newExam = await Exam.create({
-        subject,
-        createdBy,
-        isPrivate,
-        title,
-        type,
-        link,
-        examDate,
-        duration,
-        minScore,
-        questionsList,
-        status: "drafting",
+        questionsList
       });
 
-      res.status(201).json(newExam);
+      const savedExam = await newExam.save();
+      res.status(201).json(savedExam);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create exam" });
+      res.status(500).json({ message: 'Something went wrong' });
     }
   },
-  updateExam: async (req, res) => {
+
+  // Endpoint: Sửa đề thi
+  editExam: async (req, res) => {
     try {
-      const { id } = req.params;
-      const {
-        subject,
-        isPrivate,
-        title,
-        type,
-        link,
-        examDate,
-        duration,
-        minScore,
-        questionsList,
-      } = req.body;
-
-      const updatedExam = await Exam.findByIdAndUpdate(
-        id,
-        {
-          subject,
-          isPrivate,
-          title,
-          type,
-          link,
-          examDate,
-          duration,
-          minScore,
-          questionsList,
-        },
-        { new: true }
-      );
-
-      if (!updatedExam) {
-        return res.status(404).json({ error: "Exam not found" });
-      }
-
-      res.json(updatedExam);
+      const examID = req.params.examID;
+      const updatedExam = await Exam.findByIdAndUpdate(examID, req.body, { new: true });
+      res.status(200).json(updatedExam);
     } catch (error) {
-      res.status(500).json({ error: "Failed to update exam" });
+      res.status(500).json({ message: 'Something went wrong' });
     }
   },
+
+  // Endpoint: Tìm đề thi theo người tạo
   findExamsByCreatedBy: async (req, res) => {
     try {
-      const { createdBy } = req.query;
-
+      const createdBy = req.params.createdBy;
+      console.log(createdBy)
       const exams = await Exam.find({ createdBy });
-
-      res.json(exams);
+      console.log(exams)
+      res.status(200).json(exams);
     } catch (error) {
-      res.status(500).json({ error: "Failed to get exams" });
+      res.status(500).json({ message: 'Something went wrong' });
     }
   },
 
+  // Endpoint: Xóa đề thi
   deleteExam: async (req, res) => {
     try {
-      const { id } = req.params;
-
-      const deletedExam = await Exam.findByIdAndDelete(id);
-
-      if (!deletedExam) {
-        return res.status(404).json({ error: "Exam not found" });
-      }
-
-      res.json({ message: "Exam deleted successfully" });
+      const examID = req.params.examID;
+      await Exam.findByIdAndRemove(examID);
+      res.status(200).json({ message: 'Exam deleted successfully' });
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete exam" });
+      res.status(500).json({ message: 'Something went wrong' });
     }
   },
+
+  // Endpoint: Chia sẻ đề thi cho người khác (Clone đề thi)
   shareExam: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { sharedBy } = req.body;
+      const examID = req.params.examID;
+      const examToShare = await Exam.findById(examID).populate('questionsList').exec();
+      const clonedExam = { ...examToShare.toObject(), _id: null, createdBy: req.body.sharedBy, examID: null };
 
-      const examToShare = await Exam.findById(id);
-
-      if (!examToShare) {
-        return res.status(404).json({ error: "Exam not found" });
-      }
-
-      const sharedExam = await Exam.create({
-        subject: examToShare.subject,
-        createdBy: sharedBy,
-        isPrivate: examToShare.isPrivate,
-        title: examToShare.title,
-        type: examToShare.type,
-        link: examToShare.link,
-        examDate: examToShare.examDate,
-        duration: examToShare.duration,
-        minScore: examToShare.minScore,
-        questionsList: examToShare.questionsList,
-        status: "shared",
-      });
-
-      res.status(201).json(sharedExam);
+      const savedExam = await new Exam(clonedExam).save();
+      res.status(201).json(savedExam);
     } catch (error) {
-      res.status(500).json({ error: "Failed to share exam" });
+      res.status(500).json({ message: 'Something went wrong' });
     }
-  },
+  }
 };
 
 export default examController;
