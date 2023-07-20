@@ -39,7 +39,7 @@ async function main() {
     app.use("/subject",subjectRouter)
     app.use("/search", searchRouter)
     app.use("/class", classRouter)
-    app.use("user", userResourceRouter)
+    app.use("/user", userResourceRouter)
     // Start server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
