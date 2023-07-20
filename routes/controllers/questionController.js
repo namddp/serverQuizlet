@@ -2,10 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import { v4 as uuidv4 } from "uuid";
 import Question from "../../models/Question.js";
-import { check, validationResult } from "express-validator";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import admin from "../../configs/firebase.js";
 
 const questionController = {
   getAllQuestions: async (req, res) => {
@@ -17,6 +13,16 @@ const questionController = {
       res.status(500).json({ error: "Failed to get questions" });
     }
   },
+  getQuestionBySubject: async(req,res) => {
+    const { subjectID } = req.params;
+    try{
+      const questions = await Question.find({subject : subjectID})
+          res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get questions" });
+    }
+  },
+
   getQuestionById: async (req, res) => {
     const { id } = req.params;
     try {

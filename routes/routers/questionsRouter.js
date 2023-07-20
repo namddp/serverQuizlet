@@ -8,6 +8,9 @@ questionsRouter.get("/", questionController.getAllQuestions);
 // Get a question by ID
 questionsRouter.get("/getone/:id", questionController.getQuestionById);
 
+//get all questions of subject
+questionsRouter.get("/:subjectID",questionController.getQuestionBySubject)
+
 // Create a new question
 questionsRouter.post("/create", questionController.createQuestion);
 
