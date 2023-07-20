@@ -1,6 +1,6 @@
 import express from "express";
 import userResourceController from "../controllers/userResourceController.js"
-const userResourceRouter = express.router()
+const userResourceRouter = express.Router()
 
 // Endpoint: Tạo mới thư mục
 userResourceRouter.post("/createFolder", userResourceController.createFolder);

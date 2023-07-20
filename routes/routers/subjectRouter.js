@@ -1,6 +1,6 @@
 import express from "express" ;
 import subjectController  from "../controllers/subjectController.js";
-const subjectRouter = express.router()
+const subjectRouter = express.Router()
 // Endpoint: Tạo mới môn học
 subjectRouter.post("/createSubject", subjectController.createSubject);
 

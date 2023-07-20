@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userResourcesSchema = new mongoose.Schema({
   folderID: { type: String, required: true },
@@ -13,4 +13,4 @@ const userResourcesSchema = new mongoose.Schema({
 
 const UserResource = mongoose.model("UserResources", userResourcesSchema);
 
-module.exports = UserResource;
+export default UserResource
