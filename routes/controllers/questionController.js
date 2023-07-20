@@ -13,6 +13,16 @@ const questionController = {
       res.status(500).json({ error: "Failed to get questions" });
     }
   },
+  getQuestionBySubject: async(req,res) => {
+    const { subjectID } = req.params;
+    try{
+      const questions = await Question.find({subject : subjectID})
+          res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get questions" });
+    }
+  },
+
   getQuestionById: async (req, res) => {
     const { id } = req.params;
     try {

@@ -19,3 +19,5 @@ export async function connectDB() {
 //Define Collections
 export const usersCollection = mongoose.connection.collection("users");
 export const questionsCollection = mongoose.connection.collection("questions");
+export const examsCollection = mongoose.connection.collection("exam");
+

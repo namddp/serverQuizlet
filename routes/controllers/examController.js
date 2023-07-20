@@ -1,3 +1,4 @@
+
 import express from 'express';
 import Exam from '../../models/Exam.js';
 
@@ -78,3 +79,4 @@ const examController = {
 };
 
 export default examController;
+
