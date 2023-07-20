@@ -1,7 +1,8 @@
-const Subject = require("../models/subject");
+import Subject from "../../models/Subject.js";
 
+const subjectController = {
 // Tạo mới môn học
-const createSubject = async (req, res) => {
+ createSubject : async (req, res) => {
   try {
     const { subjectID, subjectName, subjectIcon } = req.body;
     const newSubject = new Subject({
@@ -15,10 +16,10 @@ const createSubject = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-};
+},
 
 // Chỉnh sửa môn học
-const editSubject = async (req, res) => {
+ editSubject : async (req, res) => {
   try {
     const subjectID = req.params.id;
     const updatedSubject = await Subject.findByIdAndUpdate(
@@ -30,10 +31,10 @@ const editSubject = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-};
+},
 
 // Xóa môn học
-const deleteSubject = async (req, res) => {
+ deleteSubject : async (req, res) => {
   try {
     const subjectID = req.params.id;
     await Subject.findByIdAndRemove(subjectID);
@@ -41,10 +42,8 @@ const deleteSubject = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-};
+},
+}
 
-module.exports = {
-  createSubject,
-  editSubject,
-  deleteSubject,
-};
+
+export default subjectController

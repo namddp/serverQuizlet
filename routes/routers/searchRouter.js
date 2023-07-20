@@ -1,14 +1,15 @@
-const express = require("express");
-const router = express.Router();
-const searchController = require("../controllers/searchController");
+import express from "express" ;
+import searchController from "../controllers/searchController.js";
+const searchRouter = express.router()
+
 
 // Endpoint: Tìm kiếm môn học
-router.get("/searchSubjects", searchController.searchSubjects);
+searchRouter.get("/searchSubjects", searchController.searchSubjects);
 
 // Endpoint: Tìm kiếm câu hỏi
-router.get("/searchQuestions", searchController.searchQuestions);
+searchRouter.get("/searchQuestions", searchController.searchQuestions);
 
 // Endpoint: Tìm kiếm đề thi
-router.get("/searchExams", searchController.searchExams);
+searchRouter.get("/searchExams", searchController.searchExams);
 
-module.exports = router;
+export default searchRouter

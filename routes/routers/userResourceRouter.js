@@ -1,32 +1,32 @@
-const express = require("express");
-const router = express.Router();
-const userResourcesController = require("../controllers/userResoucesController");
+import express from "express";
+import userResourceController from "../controllers/userResourceController.js"
+const userResourceRouter = express.router()
 
 // Endpoint: Tạo mới thư mục
-router.post("/createFolder", userResourcesController.createFolder);
+userResourceRouter.post("/createFolder", userResourceController.createFolder);
 
 // Endpoint: Hiển thị các đề thi đang soạn thảo (Drafting exams)
-router.get("/showDraftingExams", userResourcesController.showDraftingExams);
+userResourceRouter.get("/showDraftingExams", userResourceController.showDraftingExams);
 
 // Endpoint: Lưu câu hỏi (Save question)
-router.put("/saveQuestion/:folderID", userResourcesController.saveQuestion);
+userResourceRouter.put("/saveQuestion/:folderID", userResourceController.saveQuestion);
 
 // Endpoint: Xóa câu hỏi đã lưu (Delete saved question)
-router.put(
+userResourceRouter.put(
   "/deleteSavedQuestion/:folderID",
-  userResourcesController.deleteSavedQuestion
+  userResourceController.deleteSavedQuestion
 );
 
 // Endpoint: Lưu đề thi (Save exam)
-router.put("/saveExam/:folderID", userResourcesController.saveExam);
+userResourceRouter.put("/saveExam/:folderID", userResourceController.saveExam);
 
 // Endpoint: Xóa đề thi đã lưu (Delete saved exam)
-router.put(
+userResourceRouter.put(
   "/deleteSavedExam/:folderID",
-  userResourcesController.deleteSavedExam
+  userResourceController.deleteSavedExam
 );
 
 // Endpoint: Xóa thư mục
-router.delete("/deleteFolder/:folderID", userResourcesController.deleteFolder);
+userResourceRouter.delete("/deleteFolder/:folderID", userResourceController.deleteFolder);
 
-module.exports = router;
+export default userResourceRouter
