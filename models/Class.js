@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const ClassSchema = new Schema({
-  classID: { type: String, required: true },
+  // classID: { type: String, required: true },
   createdBy: { type: String, required: true },
   className: { type: String, required: true },
   studentList: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

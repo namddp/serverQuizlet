@@ -6,20 +6,19 @@ import Class from "../../models/Class.js";
 const classController = {
    createClass : async (req, res) => {
     try {
-      const { classID, createdBy, className, studentList, upComingExams } =
+      const {createdBy, className } =
         req.body;
       const newClass = new Class({
-        classID,
         createdBy,
         className,
-        studentList,
-        upComingExams,
+        studentList: [],
+        upComingExams: [],
       });
   
       const savedClass = await newClass.save();
       res.status(201).json(savedClass);
     } catch (error) {
-      res.status(500).json({ message: "Something went wrong" });
+      res.status(500).json({ message: error });
     }
   },
   
