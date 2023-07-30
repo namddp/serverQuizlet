@@ -58,7 +58,6 @@ const authRouterController = {
 
       const newUser = await registerInfo.save();
       // Dùng method save() thay vì insertOne() để tạo document mới với toàn bộ các trường dữ liệu đã định nghĩa trong schema User
-
       if (!newUser) {
         return res.status(500).json({ message: "Đăng ký không thành công!" });
       }
@@ -67,8 +66,24 @@ const authRouterController = {
       const mailOptions = mailConfigs.registrationSuccess(email);
       await sendEmail(mailOptions);
 
-      res.status(201).json({
-        message: "Đăng ký thành công.",
+      const accessToken = authRouterController.genAccessToken(newUser);
+      const refreshToken = authRouterController.genRefreshToken(newUser);
+      delete newUser._doc.password
+      // // loại bỏ password trước khi trả thông tin người dùng trong response.
+      // // user._doc = lấy ra các trường dữ liệu có giá trị do dev define, lược bỏ các trường metadata do DB thêm khi tạo doc.
+
+      // // lưu refresh token vào cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        sameSite: "strict",
+      });
+
+      // // trả response thông tin người dùng vừa đăng nhập cùng access token
+      res.status(200).json({
+        ...newUser._doc,
+        accessToken: accessToken,
       });
     } catch (error) {
       res.status(400).json({
